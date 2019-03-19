@@ -1,0 +1,81 @@
+==================================================
+Simulator Log File Header
+==================================================
+
+Version                : 1.050000
+Program file name      : metadata0.mdf
+CPU schedule selection : SJF-N
+Quantum time           : 55
+Memory Available       : 111
+Process cycle rate     : 10
+I/O cycle rate         : 20
+Log to selection       : Both
+Log file name          : logfile1.lgf
+
+==================================================
+==================================================
+
+===============
+Simulator Start
+===============
+
+[0.000000] OS: System Start
+[0.000006] OS: Creating Process Control Blocks
+[0.000013] OS: All processes initialized in "new" state
+[0.000019] OS: All processes now set to state "ready"
+[0.000024] OS: Selected process 1 with 9640ms remaining
+
+[0.000031] Process: 1, run operation start
+[0.080152] Process: 1, run operation end
+[0.080197] Process: 1, hard drive input start
+[0.620327] Process: 1, hard drive input end
+[0.620368] Process: 1, printer output start
+[2.120499] Process: 1, printer output end
+[2.120542] Process: 1, keyboard input start
+[4.520638] Process: 1, keyboard input end
+[4.520677] Process: 1, printer output start
+[5.420792] Process: 1, printer output end
+[5.420831] Process: 1, run operation start
+[5.500925] Process: 1, run operation end
+[5.500961] Process: 1, printer output start
+[6.401069] Process: 1, printer output end
+[6.401111] Process: 1, keyboard input start
+[8.601220] Process: 1, keyboard input end
+[8.601261] Process: 1, printer output start
+[9.501379] Process: 1, printer output end
+[9.501421] Process: 1, run operation start
+[9.641528] Process: 1, run operation end
+
+[9.641567] Process: 1 ended and set in "exit" state
+
+[9.641575] OS: Selected process 0 with 9650ms remaining
+
+[9.641582] Process: 0, run operation start
+[9.731677] Process: 0, run operation end
+[9.731715] Process: 0, hard drive input start
+[10.271821] Process: 0, hard drive input end
+[10.271867] Process: 0, printer output start
+[11.771950] Process: 0, printer output end
+[11.771994] Process: 0, keyboard input start
+[14.172095] Process: 0, keyboard input end
+[14.172136] Process: 0, printer output start
+[15.072204] Process: 0, printer output end
+[15.072228] Process: 0, run operation start
+[15.152317] Process: 0, run operation end
+[15.152358] Process: 0, printer output start
+[16.052492] Process: 0, printer output end
+[16.052532] Process: 0, keyboard input start
+[18.252623] Process: 0, keyboard input end
+[18.252662] Process: 0, printer output start
+[19.152766] Process: 0, printer output end
+[19.152808] Process: 0, run operation start
+[19.292908] Process: 0, run operation end
+
+[19.292951] Process: 0 ended and set in "exit" state
+
+[19.292959] OS: System stop
+
+=========================
+End Simulation - Complete
+=========================
+
