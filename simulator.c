@@ -21,10 +21,11 @@
 */
 int simulate(struct simAction *actionsList, struct configValues *settings, struct logEvent *logList)
 {
-    int numApps, runningApp, timeSec, timeUsec, totalTime, cycleTime;
+    int numApps, runningApp, timeSec, timeUsec, totalTime, cycleTime, memoryReturn;
+    int memoryValues[3];
     char *type, *line;
     struct PCB *controlBlock;
-    struct MMU *mmu;
+    struct MMU *mmu = calloc(1, sizeof(struct MMU *));
     struct simAction *programCounter;
     struct timeval startTime;
     struct timeval runtime;
@@ -102,34 +103,38 @@ int simulate(struct simAction *actionsList, struct configValues *settings, struc
         programCounter = controlBlock->pc;
 
         //iterates until A(end) occurs
-        while (!strCmp(programCounter->operationString, "end"))
+        while (!strCmp(programCounter->operationString, "end") && controlBlock->timeRemaining != 0)
         {
 
             //if program counter's command letter is not 'A'
             if (programCounter->commandLetter != 'A')
             {
 
-                //if program counter's command letter is 'P
-                if (programCounter->commandLetter == 'P')
+                switch (programCounter->commandLetter)
                 {
+                //if program counter's command letter is 'P
+                case 'P':
                     cycleTime = settings->cpuCycleTime;
                     type = "operation";
-                }
-
-                //if program counter's command letter is 'I' or 'O'
-                else if (programCounter->commandLetter == 'I' || programCounter->commandLetter == 'O')
-                {
+                    break;
+                //if program counter's command letter is 'I'
+                case 'I':
                     cycleTime = settings->ioCycleTime;
-
-                    //setting the correct type for each command letter
-                    if (programCounter->commandLetter == 'I')
-                    {
-                        type = "input";
-                    }
-                    else
-                    {
-                        type = "output";
-                    }
+                    type = "input";
+                    break;
+                //if program counter's command letter is 'O'
+                case 'O':
+                    cycleTime = settings->ioCycleTime;
+                    type = "output";
+                    break;
+                //if program counter's command letter is 'M'
+                case 'M':
+                    cycleTime = settings->ioCycleTime;
+                    type = "memory";
+                    break;
+                //should never be reached by this point in the program
+                default:
+                    break;
                 }
 
                 //creating time time values and setting timeval data
@@ -142,14 +147,64 @@ int simulate(struct simAction *actionsList, struct configValues *settings, struc
                 sprintf(line, "[%lf] Process: %d, %s %s start\n", tv2double(execTime(startTime)), controlBlock->processNum, programCounter->operationString, type);
                 logIt(line, logList, logToMon, logToFile);
 
-                //runs app for amount of time stored in runtime struct
-                runFor(runtime);
+                if (programCounter->commandLetter == 'M')
+                {
+
+                    stripMemoryValues(programCounter->assocVal, memoryValues);
+
+                    if (strCmp(programCounter->operationString, "allocate"))
+                    {
+                        memoryReturn = allocate(mmu, memoryValues[0], memoryValues[1], memoryValues[2], settings->memoryAvailable);
+
+                        if (memoryReturn)
+                        {
+                            if (memoryReturn == MEMORY_ALREADY_ALLOCATED_ERROR)
+                            {
+                                sprintf(line, "[%lf] ERROR: Segfault. Memory block %d already allocated.\n", tv2double(execTime(startTime)), memoryValues[1]);
+                                logIt(line, logList, logToMon, logToFile);
+                                controlBlock->timeRemaining = 0;
+                            }
+                            else if (memoryReturn == CANNOT_ALLOCATE_MEMORY_AMOUNT_ERROR)
+                            {
+                                //TODO: TRACK MEMORY ON CONTROL BLOCK ITSELF
+                                sprintf(line, "[%lf] ERROR: Segfault. Tried to allocate more memory than was available for process.\n", tv2double(execTime(startTime)));
+                                logIt(line, logList, logToMon, logToFile);
+                                controlBlock->timeRemaining = 0;
+                            }
+                        }
+                    }
+                    else if (strCmp(programCounter->operationString, "access"))
+                    {
+                        memoryReturn = access(mmu, memoryValues[0], memoryValues[1], memoryValues[2]);
+
+                        if (memoryReturn)
+                        {
+                            if (memoryReturn == MEMORY_ACCESS_OUTSIDE_BOUNDS_ERROR)
+                            {
+                                sprintf(line, "[%lf] ERROR: SEGFAULT. Tried to access memory outside of allocated memory.\n", tv2double(execTime(startTime)));
+                                logIt(line, logList, logToMon, logToFile);
+                                controlBlock->timeRemaining = 0;
+                            }
+                            else if (memoryReturn == WRONG_MEMORY_ACCESS_ID_ERROR)
+                            {
+                                sprintf(line, "[%lf] ERROR: SEGFAULT. Tried to access memory using the wrong identifier.\n", tv2double(execTime(startTime)));
+                                logIt(line, logList, logToMon, logToFile);
+                                controlBlock->timeRemaining = 0;
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    //runs app for amount of time stored in runtime struct
+                    runFor(runtime);
+
+                    //subtracts from timeRemaining how much time the app was run for
+                    controlBlock->timeRemaining -= ((timeSec * MS_PER_SEC) + (timeUsec / USEC_PER_MS));
+                }
 
                 sprintf(line, "[%lf] Process: %d, %s %s end\n", tv2double(execTime(startTime)), controlBlock->processNum, programCounter->operationString, type);
                 logIt(line, logList, logToMon, logToFile);
-
-                //subtracts from timeRemaining how much time the app was run for
-                controlBlock->timeRemaining -= ((timeSec * MS_PER_SEC) + (timeUsec / USEC_PER_MS));
             }
 
             //iterates program counter

@@ -18,14 +18,17 @@ enum
     FIRST = -10
 };
 
+//strips the values from the associated value for memory operations
+void stripMemoryValues(int associatedValue, int *values);
+
 //checks to see if memory can be allocated
-bool canAllocate(struct MMU *mmu, int id, int base, int offset, int maxOffset);
+int canAllocate(struct MMU *mmu, int id, int base, int offset, int maxOffset);
 
 //checks to see if process can access memory
-bool canAccess(struct MMU *mmu, int id, int base);
+int canAccess(struct MMU *mmu, int id, int base, int offset);
 
 //allocates memory to a process
-int allocate(struct MMU *mmu, int id, int base, int offset);
+int allocate(struct MMU *mmu, int id, int base, int offset, int maxOffset);
 
 //accesses memory from a process
 int access(struct MMU *mmu, int id, int base, int offset);

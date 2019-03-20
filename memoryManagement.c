@@ -1,8 +1,11 @@
 #include "memoryManagement.h"
 #include "booleans.h"
 #include "timer.h"
+#include "errors.h"
+#include <stdlib.h>
+#include <stdio.h>
 
-bool canAllocate(struct MMU *mmu, int id, int base, int offset, int maxOffset)
+int canAllocate(struct MMU *mmu, int id, int base, int offset, int maxOffset)
 {
     struct MMU *tmp = mmu;
 
@@ -11,11 +14,11 @@ bool canAllocate(struct MMU *mmu, int id, int base, int offset, int maxOffset)
 
         if (tmp->base == base)
         {
-            return FALSE; //TODO: CREATE A SEGFAULT ERROR CODE FOR THIS
+            return MEMORY_ALREADY_ALLOCATED_ERROR;
         }
         else if (offset > maxOffset)
         {
-            return FALSE; //TODO: CREATE AN ERROR CODE FOR THIS
+            return CANNOT_ALLOCATE_MEMORY_AMOUNT_ERROR;
         }
 
         tmp = tmp->next;
@@ -23,17 +26,17 @@ bool canAllocate(struct MMU *mmu, int id, int base, int offset, int maxOffset)
 
     if (tmp->base == base)
     {
-        return FALSE; //TODO: CREATE A SEGFAULT ERROR CODE FOR THIS
+        return MEMORY_ALREADY_ALLOCATED_ERROR;
     }
     else if (offset > maxOffset)
     {
-        return FALSE; //TODO: CREATE AN ERROR CODE FOR THIS
+        return CANNOT_ALLOCATE_MEMORY_AMOUNT_ERROR;
     }
 
-    return TRUE;
+    return 0;
 }
 
-bool canAccess(struct MMU *mmu, int id, int base, int offset)
+int canAccess(struct MMU *mmu, int id, int base, int offset)
 {
 
     struct MMU *tmp = mmu;
@@ -44,27 +47,43 @@ bool canAccess(struct MMU *mmu, int id, int base, int offset)
         {
             if (tmp->id != id)
             {
-                return FALSE; //TODO: CREATE AND ERROR CODE FOR THIS
+                return WRONG_MEMORY_ACCESS_ID_ERROR;
             }
             else if (tmp->offset < offset)
             {
-                return FALSE; //TODO: CREATE AN ERROR CODE FOR THIS
+                return MEMORY_ACCESS_OUTSIDE_BOUNDS_ERROR;
             }
 
-            return TRUE;
+            return 0;
         }
     }
 
-    return FALSE;
+    if (tmp->base == base)
+    {
+        if (tmp->id != id)
+        {
+            return WRONG_MEMORY_ACCESS_ID_ERROR;
+        }
+        else if (tmp->offset < offset)
+        {
+            return MEMORY_ACCESS_OUTSIDE_BOUNDS_ERROR;
+        }
+        return 0;
+    }
+
+    return CANNOT_ACCESS_MEMORY_ERROR;
 }
 
 int allocate(struct MMU *mmu, int id, int base, int offset, int maxOffset)
 {
+    int error;
     struct MMU *tmp = mmu;
 
-    if (!canAllocate(mmu, id, base, offset, maxOffset))
+    error = canAllocate(mmu, id, base, offset, maxOffset);
+
+    if (error)
     {
-        return 0; //TODO: NEW ERROR CODE HERE FOR NOT BEING ABLE TO ALLOCATE MEMORY. SEGFAULT
+        return error;
     }
 
     while (tmp->next)
@@ -81,14 +100,27 @@ int allocate(struct MMU *mmu, int id, int base, int offset, int maxOffset)
     tmp->id = id;
     tmp->base = base;
     tmp->offset = offset;
+
+    return 0;
 }
 
 int access(struct MMU *mmu, int id, int base, int offset)
 {
-    if (!canAccess(mmu, id, base, offset))
+    int error;
+
+    error = canAccess(mmu, id, base, offset);
+
+    if (error)
     {
-        return 0; //TODO: NEW ERROR CODE HERE FOR NOT BEING ABLE TO ACCESS MEMORY. SEGFAULT
+        return error;
     }
 
     return 0;
+}
+
+void stripMemoryValues(int associatedValue, int *values)
+{
+    values[0] = associatedValue / 1000000;
+    values[1] = (associatedValue / 1000) - (values[0] * 1000);
+    values[2] = associatedValue - ((values[0] * 1000000) + (values[1] * 1000));
 }
