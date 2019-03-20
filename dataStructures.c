@@ -346,6 +346,7 @@ void createPCBList(struct PCB **pcbList, struct simAction *head, struct configVa
             //sets process number, state to new, and program counter
             controlBlock->processNum = processNum;
             controlBlock->state = new;
+            controlBlock->memoryUsed = 0;
             controlBlock->pc = actionIter;
 
             //turns on calculating flag

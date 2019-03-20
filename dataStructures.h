@@ -22,7 +22,7 @@ struct configValues
 };
 
 //HOLDS ALL INFORMATION PERTAINING TO ONE ACTION
-struct simAction 
+struct simAction
 {
     char commandLetter;
     int assocVal;
@@ -35,6 +35,7 @@ struct PCB
 {
     int processNum;
     int timeRemaining;
+    int memoryUsed;
     char *state;
     struct simAction *pc;
 };
@@ -43,7 +44,7 @@ struct PCB
 void createPCBList(struct PCB **pcbList, struct simAction *head, struct configValues *settings);
 
 //FREES ALL MEMORY ASSOCIATED WITH simActionS
-void freeActions(struct simAction* head);
+void freeActions(struct simAction *head);
 
 //PRINTS ALL ALL RELEVANT simAction INFORMATION FOR ALL simActionS
 void printSimActions(struct simAction *head, struct configValues *settings);

@@ -5,6 +5,7 @@
 #include "strUtils.h"
 #include "logger.h"
 #include "errors.h"
+#include "memoryManagement.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/time.h>
@@ -23,12 +24,16 @@ int simulate(struct simAction *actionsList, struct configValues *settings, struc
     int numApps, runningApp, timeSec, timeUsec, totalTime, cycleTime;
     char *type, *line;
     struct PCB *controlBlock;
+    struct MMU *mmu;
     struct simAction *programCounter;
     struct timeval startTime;
     struct timeval runtime;
     bool programsToRun = TRUE;
     bool logToMon = FALSE;
     bool logToFile = FALSE;
+
+    //identifying that this mmu link is the first mmu unit
+    mmu->id = FIRST;
 
     //allocating memory for line
     line = calloc(100, sizeof(char));
