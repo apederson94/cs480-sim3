@@ -2,21 +2,25 @@
 #include "booleans.h"
 #include "timer.h"
 #include "errors.h"
+#include "dataStructures.h"
 #include <stdlib.h>
 #include <stdio.h>
 
-int canAllocate(struct MMU *mmu, int id, int base, int offset, int maxOffset)
+int canAllocate(struct MMU *mmu, int id, int base, int offset, int maxOffset, struct PCB *controlBlock)
 {
     struct MMU *tmp = mmu;
+    int totalAllocated = 0;
 
     while (tmp->next)
     {
+
+        totalAllocated += tmp->offset;
 
         if (tmp->base == base)
         {
             return MEMORY_ALREADY_ALLOCATED_ERROR;
         }
-        else if (offset > maxOffset)
+        else if ((totalAllocated + offset) > maxOffset)
         {
             return CANNOT_ALLOCATE_MEMORY_AMOUNT_ERROR;
         }
@@ -24,11 +28,13 @@ int canAllocate(struct MMU *mmu, int id, int base, int offset, int maxOffset)
         tmp = tmp->next;
     }
 
+    totalAllocated += tmp->offset;
+
     if (tmp->base == base)
     {
         return MEMORY_ALREADY_ALLOCATED_ERROR;
     }
-    else if (offset > maxOffset)
+    else if ((totalAllocated + offset) > maxOffset)
     {
         return CANNOT_ALLOCATE_MEMORY_AMOUNT_ERROR;
     }
@@ -74,12 +80,12 @@ int canAccess(struct MMU *mmu, int id, int base, int offset)
     return CANNOT_ACCESS_MEMORY_ERROR;
 }
 
-int allocate(struct MMU *mmu, int id, int base, int offset, int maxOffset)
+int allocate(struct MMU *mmu, int id, int base, int offset, int maxOffset, struct PCB *controlBlock)
 {
     int error;
     struct MMU *tmp = mmu;
 
-    error = canAllocate(mmu, id, base, offset, maxOffset);
+    error = canAllocate(mmu, id, base, offset, maxOffset, controlBlock);
 
     if (error)
     {
@@ -100,6 +106,8 @@ int allocate(struct MMU *mmu, int id, int base, int offset, int maxOffset)
     tmp->id = id;
     tmp->base = base;
     tmp->offset = offset;
+
+    controlBlock->memoryUsed += offset;
 
     return 0;
 }

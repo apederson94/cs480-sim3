@@ -30,7 +30,7 @@ void freeActions(struct simAction *head)
         * iterates over the list and prints all of the info associates
           with the actions in the list
 */
-void printSimActions(struct simAction *head, struct configValues *settings)
+void printSimActions(struct simAction *head)
 {
     struct simAction *ptr = head;
 
@@ -38,7 +38,7 @@ void printSimActions(struct simAction *head, struct configValues *settings)
     {
         printf("Op code letter: %c\n", ptr->commandLetter);
         printf("Op code name  : %s\n", ptr->operationString);
-        printf("Op code value : %d\n\n", ptr->assocVal);
+        printf("Op code value : %ld\n\n", ptr->assocVal);
         ptr = ptr->next;
     }
 }
@@ -71,7 +71,8 @@ void printConfigValues(struct configValues *src, char *fileName)
 */
 int setActionData(char *command, struct simAction *action)
 {
-    int cmdLength, pos, opFlag, opIter, value;
+    long value;
+    int cmdLength, pos, opFlag, opIter;
     char currentChar, opStr[40];
 
     cmdLength = strLen(command);
@@ -430,4 +431,47 @@ void freeConfigValues(struct configValues *settings)
     free(settings->logPath);
     free(settings->logTo);
     free(settings);
+}
+
+//verifies system settings
+int verifySettings(struct configValues *settings)
+{
+    if (!settings->ver)
+    {
+        return VERSION_NOT_PARSED;
+    }
+    else if (!settings->mdfPath)
+    {
+        return MDF_PATH_NOT_PARSED;
+    }
+    else if (!settings->cpuSched)
+    {
+        return CPU_SCHED_NOT_PARSED;
+    }
+    else if (!settings->logPath)
+    {
+        return LOG_PATH_NOT_PARSED;
+    }
+    else if (!settings->logTo)
+    {
+        return LOG_TO_NOT_PARSED;
+    }
+    else if (!settings->quantumTime)
+    {
+        return QUANTUM_NOT_PARSED;
+    }
+    else if (!settings->memoryAvailable)
+    {
+        return MEM_AVAIL_NOT_PARSED;
+    }
+    else if (!settings->cpuCycleTime)
+    {
+        return CPU_CYCLE_NOT_PARSED;
+    }
+    else if (!settings->ioCycleTime)
+    {
+        return IO_CYCLE_NOT_PARSED;
+    }
+
+    return 0;
 }

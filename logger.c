@@ -27,14 +27,13 @@ void appendToLog(struct logEvent *logList, char *entry)
     //if log entry exists already, allocate memory for next and set logIter to the next node in linked list
     if (logIter->entry)
     {
-        logIter->next = (struct logEvent *) calloc(1, sizeof(struct logEvent));
+        logIter->next = (struct logEvent *)calloc(1, sizeof(struct logEvent));
         logIter = logIter->next;
     }
-    
-    //allocating memory for and setting log entry data
-    logIter->entry = (char *) calloc(strLen(entry)+1, sizeof(char));
-    strCopy(entry, logIter->entry);
 
+    //allocating memory for and setting log entry data
+    logIter->entry = (char *)calloc(strLen(entry) + 1, sizeof(char));
+    strCopy(entry, logIter->entry);
 }
 
 /*
@@ -92,7 +91,6 @@ void appendSettingsToLog(struct logEvent *logList, struct configValues *settings
     appendToLog(logList, "==================================================\n\n");
 }
 
-
 /* 
     iterates over simAction struct linked list and appends data to log:
         * iterates over sim actions
@@ -102,7 +100,7 @@ void appendSimActionsToLog(struct logEvent *logList, struct simAction *head)
 {
     struct simAction *actionsIter = head;
     char *cmd, *opString, *assocVal;
-    
+
     //iterating over linked list
     while (actionsIter->next)
     {
@@ -114,7 +112,7 @@ void appendSimActionsToLog(struct logEvent *logList, struct simAction *head)
         //setting each temporary storage string
         sprintf(cmd, "Op code letter: %c\n", actionsIter->commandLetter);
         sprintf(opString, "Op code name  : %s\n", actionsIter->operationString);
-        sprintf(assocVal, "Op code value : %d\n\n", actionsIter->assocVal);
+        sprintf(assocVal, "Op code value : %ld\n\n", actionsIter->assocVal);
 
         //adding each temporary storage string to the log
         appendToLog(logList, cmd);
@@ -123,7 +121,6 @@ void appendSimActionsToLog(struct logEvent *logList, struct simAction *head)
 
         actionsIter = actionsIter->next;
     }
-
 }
 
 /*
@@ -160,7 +157,7 @@ int createLogFile(char *fileName, struct logEvent *head)
             substr(logIter->entry, 0, strLen(logIter->entry) - 1, logIter->entry);
             fprintf(logFile, "%s\n", logIter->entry);
         }
-        
+
         logIter = logIter->next;
     }
 
@@ -169,7 +166,7 @@ int createLogFile(char *fileName, struct logEvent *head)
     {
         fprintf(logFile, "%s\n", logIter->entry);
     }
-    
+
     fclose(logFile);
 
     return 0;
@@ -196,7 +193,6 @@ void freeLog(struct logEvent *head)
     //frees the last node in the log linked list as well as associated memory
     free(head->entry);
     free(head);
-
 }
 
 /*
@@ -214,7 +210,6 @@ void printLog(struct logEvent *logList)
 
     //prints last entry in log
     printf("%s\n", entry->entry);
-
 }
 
 /*
@@ -226,7 +221,7 @@ void logIt(char *line, struct logEvent *logList, bool logToMon, bool logToFile)
     {
         printf("%s", line);
     }
-    
+
     if (logToFile)
     {
         appendToLog(logList, line);

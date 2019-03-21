@@ -25,7 +25,7 @@ struct configValues
 struct simAction
 {
     char commandLetter;
-    int assocVal;
+    long assocVal;
     char *operationString;
     struct simAction *next;
 };
@@ -46,8 +46,8 @@ void createPCBList(struct PCB **pcbList, struct simAction *head, struct configVa
 //FREES ALL MEMORY ASSOCIATED WITH simActionS
 void freeActions(struct simAction *head);
 
-//PRINTS ALL ALL RELEVANT simAction INFORMATION FOR ALL simActionS
-void printSimActions(struct simAction *head, struct configValues *settings);
+//PRINTS ALL ALL RELEVANT simAction INFORMATION FOR ALL simActions
+void printSimActions(struct simAction *head);
 
 //PRINTS ALL INFORMATION FORM A configValues STRUCT
 void printConfigValues(struct configValues *src, char *fileName);
@@ -71,5 +71,7 @@ void setStatesReady(struct PCB **pcbList, int numProcesses);
 void freePCBs(struct PCB **pcbList, int numApps);
 
 void freeConfigValues(struct configValues *settings);
+
+int verifySettings(struct configValues *settings);
 
 #endif

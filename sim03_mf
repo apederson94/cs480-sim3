@@ -27,7 +27,7 @@ logger.o: logger.c dataStructures.h errors.h logger.h strUtils.h
 mathUtils.o: mathUtils.c mathUtils.h
 	$(CC) $(CFLAGS) mathUtils.c
 
-memoryManagement.o: memoryManagement.c booleans.h memoryManagement.h timer.h
+memoryManagement.o: memoryManagement.c booleans.h dataStructures.h memoryManagement.h timer.h
 	$(CC) $(CFLAGS) memoryManagement.c
 
 scheduler.o: scheduler.c scheduler.h strUtils.h
