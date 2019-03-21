@@ -3,4 +3,5 @@
 *.o
 *.cnf
 *.mdf
+.vscode
 sim03
