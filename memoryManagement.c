@@ -42,7 +42,7 @@ int canAllocate(struct MMU *mmu, int id, int base, int offset, int maxOffset, st
     return 0;
 }
 
-int canAccess(struct MMU *mmu, int id, int base, int offset)
+int canAccess(struct MMU *mmu, int pid, int id, int base, int offset)
 {
 
     struct MMU *tmp = mmu;
@@ -51,7 +51,11 @@ int canAccess(struct MMU *mmu, int id, int base, int offset)
     {
         if (tmp->base == base)
         {
-            if (tmp->id != id)
+            if (tmp->ownerPID != pid)
+            {
+                return PROCESS_DOES_NOT_OWN_MEMORY;
+            }
+            else if (tmp->id != id)
             {
                 return WRONG_MEMORY_ACCESS_ID_ERROR;
             }
@@ -66,7 +70,11 @@ int canAccess(struct MMU *mmu, int id, int base, int offset)
 
     if (tmp->base == base)
     {
-        if (tmp->id != id)
+        if (tmp->ownerPID != pid)
+        {
+            return PROCESS_DOES_NOT_OWN_MEMORY;
+        }
+        else if (tmp->id != id)
         {
             return WRONG_MEMORY_ACCESS_ID_ERROR;
         }
@@ -74,6 +82,7 @@ int canAccess(struct MMU *mmu, int id, int base, int offset)
         {
             return MEMORY_ACCESS_OUTSIDE_BOUNDS_ERROR;
         }
+
         return 0;
     }
 
@@ -103,6 +112,7 @@ int allocate(struct MMU *mmu, int id, int base, int offset, int maxOffset, struc
         tmp = tmp->next;
     }
 
+    tmp->ownerPID = controlBlock->processNum;
     tmp->id = id;
     tmp->base = base;
     tmp->offset = offset;
@@ -112,11 +122,11 @@ int allocate(struct MMU *mmu, int id, int base, int offset, int maxOffset, struc
     return 0;
 }
 
-int access(struct MMU *mmu, int id, int base, int offset)
+int access(struct MMU *mmu, int pid, int id, int base, int offset)
 {
     int error;
 
-    error = canAccess(mmu, id, base, offset);
+    error = canAccess(mmu, pid, id, base, offset);
 
     if (error)
     {

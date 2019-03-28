@@ -7,6 +7,7 @@
 //holds all memory management information
 struct MMU
 {
+    int ownerPID;
     int id;
     int base;
     int offset;
@@ -26,12 +27,12 @@ void stripMemoryValues(int associatedValue, int *values);
 int canAllocate(struct MMU *mmu, int id, int base, int offset, int maxOffset, struct PCB *controlBlock);
 
 //checks to see if process can access memory
-int canAccess(struct MMU *mmu, int id, int base, int offset);
+int canAccess(struct MMU *mmu, int pid, int id, int base, int offset);
 
 //allocates memory to a process
 int allocate(struct MMU *mmu, int id, int base, int offset, int maxOffset, struct PCB *controlBlock);
 
 //accesses memory from a process
-int access(struct MMU *mmu, int id, int base, int offset);
+int access(struct MMU *mmu, int pid, int id, int base, int offset);
 
 #endif

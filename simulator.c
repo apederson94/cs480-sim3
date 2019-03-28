@@ -183,28 +183,28 @@ int simulate(struct simAction *actionsList, struct configValues *settings, struc
                         sprintf(line, "[%lf] Process: %d, MMU attempt to access %d/%d/%d\n", tv2double(execTime(startTime)), controlBlock->processNum, memoryValues[0], memoryValues[1], memoryValues[2]);
                         logIt(line, logList, logToMon, logToFile);
 
-                        memoryReturn = access(mmu, memoryValues[0], memoryValues[1], memoryValues[2]);
+                        memoryReturn = access(mmu, controlBlock->processNum, memoryValues[0], memoryValues[1], memoryValues[2]);
 
                         if (memoryReturn)
                         {
                             if (memoryReturn == MEMORY_ACCESS_OUTSIDE_BOUNDS_ERROR)
                             {
                                 sprintf(line, "[%lf] Process: %d, MMU failed to access. Outside allocated memory bounds. \n\n", tv2double(execTime(startTime)), controlBlock->processNum);
-                                logIt(line, logList, logToMon, logToFile);
-                                controlBlock->timeRemaining = 0;
                             }
                             else if (memoryReturn == WRONG_MEMORY_ACCESS_ID_ERROR)
                             {
                                 sprintf(line, "[%lf] Process: %d, MMU failed to access. Incorrect ID. \n\n", tv2double(execTime(startTime)), controlBlock->processNum);
-                                logIt(line, logList, logToMon, logToFile);
-                                controlBlock->timeRemaining = 0;
                             }
                             else if (memoryReturn == CANNOT_ACCESS_MEMORY_ERROR)
                             {
                                 sprintf(line, "[%lf] Process: %d, MMU failed to access. Base not allocated.\n\n", tv2double(execTime(startTime)), controlBlock->processNum);
-                                logIt(line, logList, logToMon, logToFile);
-                                controlBlock->timeRemaining = 0;
                             }
+                            else if (memoryReturn == PROCESS_DOES_NOT_OWN_MEMORY)
+                            {
+                                sprintf(line, "[%lf] Process: %d, MMU failed to access. Process does not own memory being tried to be accessed.\n\n", tv2double(execTime(startTime)), controlBlock->processNum);
+                            }
+                            logIt(line, logList, logToMon, logToFile);
+                            controlBlock->timeRemaining = 0;
                         }
                         else
                         {
